@@ -1,92 +1,105 @@
-using System;
+﻿using System;
 using System.IO;
-using System.Linq;
 using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 
 namespace QuickSortParallelApp
 {
     public class Program
     {
-        static void Main(string[] args)
+        public static async Task Main(string[] args)
         {
-            string inputFile = "nombres.txt";
-            string outputFile = "nombres_tries.txt";
-
-            if (!File.Exists(inputFile))
+            try
             {
-                Console.WriteLine($"{inputFile} not found, generating test file with 1000000 random numbers.");
-                GenerateTestFile(inputFile, 1000000);
-            }
-
-            int[] numbers = File.ReadAllLines(inputFile)
-                                .Select(line => int.Parse(line.Trim()))
-                                .ToArray();
-
-            QuickSortParallel(numbers, 0, numbers.Length - 1);
-
-            File.WriteAllLines(outputFile, numbers.Select(n => n.ToString()));
-
-            Console.WriteLine($"Sorted numbers have been written to {outputFile}");
-        }
-
-        public static void GenerateTestFile(string fileName, int count)
-        {
-            Random rnd = new Random();
-            using (StreamWriter writer = new StreamWriter(fileName))
-            {
-                for (int i = 0; i < count; i++)
+                // Create test file if it doesn't exist
+                if (!File.Exists("nombres.txt"))
                 {
-                    writer.WriteLine(rnd.Next());
+                    var random = new Random();
+                    var randomNumbers = Enumerable.Range(1, 1000).Select(x => random.Next(-10000, 10000)).ToList();
+                    await File.WriteAllLinesAsync("nombres.txt", randomNumbers.Select(n => n.ToString()));
+                    Console.WriteLine("Created test file 'nombres.txt' with 1000 random numbers");
                 }
+
+                // Read numbers from file
+                var lines = await File.ReadAllLinesAsync("nombres.txt");
+                var numbers = lines.Select(int.Parse).ToArray();
+
+                Console.WriteLine($"Sorting {numbers.Length} numbers using parallel quicksort...");
+                var sortedNumbers = await QuickSortParallelAsync(numbers);
+
+                // Write sorted numbers to output file
+                string outputFile = Path.GetFileNameWithoutExtension("nombres.txt") + "_tries.txt";
+                await File.WriteAllLinesAsync(outputFile, sortedNumbers.Select(n => n.ToString()));
+                Console.WriteLine($"Sorted numbers written to {outputFile}");
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"An error occurred: {ex.Message}");
             }
         }
 
-        public static void QuickSortParallel(int[] array, int left, int right)
+        public static Task<int[]> QuickSortParallelAsync(int[] arr)
+        {
+            if (arr == null)
+                return Task.FromResult<int[]>(null);
+            if (arr.Length <= 1)
+                return Task.FromResult(arr);
+
+            var result = arr.ToArray(); // Create a copy to avoid modifying the input array
+            return Task.Run(async () =>
+            {
+                await QuickSortParallelInternalAsync(result, 0, result.Length - 1);
+                return result;
+            });
+        }
+
+        private static async Task QuickSortParallelInternalAsync(int[] arr, int left, int right)
         {
             if (left < right)
             {
-                // Use parallel execution for arrays larger than 500 elements
-                if (right - left > 500)
+                if (right - left < 1000) // For small arrays, use regular quicksort
                 {
-                    int pivot = Partition(array, left, right);
-                    
-                    // Create parallel tasks for both halves
-                    Parallel.Invoke(
-                        () => QuickSortParallel(array, left, pivot - 1),
-                        () => QuickSortParallel(array, pivot + 1, right)
-                    );
+                    QuickSortSequential(arr, left, right);
+                    return;
                 }
-                else
-                {
-                    // Use regular quicksort for smaller arrays
-                    int pivot = Partition(array, left, right);
-                    QuickSortParallel(array, left, pivot - 1);
-                    QuickSortParallel(array, pivot + 1, right);
-                }
+
+                int pivot = Partition(arr, left, right);
+
+                // Sort the sub-arrays in parallel
+                await Task.WhenAll(
+                    QuickSortParallelInternalAsync(arr, left, pivot - 1),
+                    QuickSortParallelInternalAsync(arr, pivot + 1, right)
+                );
             }
         }
 
-        public static int Partition(int[] array, int left, int right)
+        private static void QuickSortSequential(int[] arr, int left, int right)
         {
-            int pivot = array[right];
+            if (left < right)
+            {
+                int pivot = Partition(arr, left, right);
+                QuickSortSequential(arr, left, pivot - 1);
+                QuickSortSequential(arr, pivot + 1, right);
+            }
+        }
+
+        private static int Partition(int[] arr, int left, int right)
+        {
+            int pivot = arr[right];
             int i = left - 1;
+
             for (int j = left; j < right; j++)
             {
-                if (array[j] <= pivot)
+                if (arr[j] <= pivot)
                 {
                     i++;
-                    Swap(array, i, j);
+                    (arr[i], arr[j]) = (arr[j], arr[i]); // Swap elements
                 }
             }
-            Swap(array, i + 1, right);
-            return i + 1;
-        }
 
-        public static void Swap(int[] array, int i, int j)
-        {
-            int temp = array[i];
-            array[i] = array[j];
-            array[j] = temp;
+            (arr[i + 1], arr[right]) = (arr[right], arr[i + 1]); // Place pivot in correct position
+            return i + 1;
         }
     }
 }

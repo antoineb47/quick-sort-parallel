@@ -1,83 +1,100 @@
-using Microsoft.VisualStudio.TestTools.UnitTesting;
-using System.IO;
-using System.Linq;
+using System;
+using System.Threading.Tasks;
+using Xunit;
+using QuickSortParallelApp;
 
 namespace QuickSortParallelApp.Tests
 {
-    [TestClass]
     public class ProgramTests
     {
-        [TestMethod]
-        public void TestQuickSortParallel()
+        [Fact]
+        public async Task QuickSortParallel_EmptyArray_ReturnsEmptyArray()
         {
             // Arrange
-            int[] unsorted = new int[] { 64, 34, 25, 12, 22, 11, 90 };
-            int[] expected = new int[] { 11, 12, 22, 25, 34, 64, 90 };
+            int[] arr = Array.Empty<int>();
 
             // Act
-            Program.QuickSortParallel(unsorted, 0, unsorted.Length - 1);
+            var result = await Program.QuickSortParallelAsync(arr);
 
             // Assert
-            CollectionAssert.AreEqual(expected, unsorted);
+            Assert.Empty(result);
         }
 
-        [TestMethod]
-        public void TestPartition()
+        [Fact]
+        public async Task QuickSortParallel_SingleElement_ReturnsSameArray()
         {
             // Arrange
-            int[] array = new int[] { 64, 34, 25, 12, 22, 11, 90 };
-            int left = 0;
-            int right = array.Length - 1;
+            int[] arr = { 1 };
 
             // Act
-            int pivotIndex = Program.Partition(array, left, right);
+            var result = await Program.QuickSortParallelAsync(arr);
 
             // Assert
-            Assert.IsTrue(pivotIndex >= left && pivotIndex <= right);
-            for (int i = left; i < pivotIndex; i++)
+            Assert.Single(result);
+            Assert.Equal(1, result[0]);
+        }
+
+        [Fact]
+        public async Task QuickSortParallel_UnsortedArray_ReturnsSortedArray()
+        {
+            // Arrange
+            int[] arr = { 64, 34, -25, 12, 22, -11, 90, 0 };
+            int[] expected = { -25, -11, 0, 12, 22, 34, 64, 90 };
+
+            // Act
+            var result = await Program.QuickSortParallelAsync(arr);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public async Task QuickSortParallel_DuplicateElements_ReturnsSortedArray()
+        {
+            // Arrange
+            int[] arr = { 5, 2, 5, 3, 2, 1, 5 };
+            int[] expected = { 1, 2, 2, 3, 5, 5, 5 };
+
+            // Act
+            var result = await Program.QuickSortParallelAsync(arr);
+
+            // Assert
+            Assert.Equal(expected, result);
+        }
+
+        [Fact]
+        public async Task QuickSortParallel_LargeArray_ReturnsSortedArray()
+        {
+            // Arrange
+            var random = new Random(42); // Use seed for reproducible tests
+            int[] arr = new int[10000];
+            for (int i = 0; i < arr.Length; i++)
             {
-                Assert.IsTrue(array[i] <= array[pivotIndex]);
+                arr[i] = random.Next(-10000, 10000);
             }
-            for (int i = pivotIndex + 1; i <= right; i++)
+
+            // Act
+            var result = await Program.QuickSortParallelAsync(arr);
+
+            // Assert
+            for (int i = 1; i < result.Length; i++)
             {
-                Assert.IsTrue(array[i] >= array[pivotIndex]);
+                Assert.True(result[i - 1] <= result[i], 
+                    $"Array not sorted at index {i}: {result[i - 1]} > {result[i]}");
             }
         }
 
-        [TestMethod]
-        public void TestSwap()
+        [Fact]
+        public async Task QuickSortParallel_NullArray_ReturnsNull()
         {
             // Arrange
-            int[] array = new int[] { 1, 2 };
-            int expected1 = array[1];
-            int expected0 = array[0];
+            int[] arr = null;
 
             // Act
-            Program.Swap(array, 0, 1);
+            var result = await Program.QuickSortParallelAsync(arr);
 
             // Assert
-            Assert.AreEqual(expected1, array[0]);
-            Assert.AreEqual(expected0, array[1]);
-        }
-
-        [TestMethod]
-        public void TestFileGeneration()
-        {
-            // Arrange
-            string testFile = "test_numbers.txt";
-            int count = 100;
-
-            // Act
-            Program.GenerateTestFile(testFile, count);
-
-            // Assert
-            Assert.IsTrue(File.Exists(testFile));
-            var lines = File.ReadAllLines(testFile);
-            Assert.AreEqual(count, lines.Length);
-            Assert.IsTrue(lines.All(line => int.TryParse(line, out _)));
-
-            // Cleanup
-            File.Delete(testFile);
+            Assert.Null(result);
         }
     }
 }
