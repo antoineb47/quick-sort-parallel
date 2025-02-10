@@ -1,0 +1,15 @@
+/workspaces/codespaces-blank/QuickSortParallelApp/bin/Debug/net6.0/quick-sort-parallel
+/workspaces/codespaces-blank/QuickSortParallelApp/bin/Debug/net6.0/quick-sort-parallel.deps.json
+/workspaces/codespaces-blank/QuickSortParallelApp/bin/Debug/net6.0/quick-sort-parallel.runtimeconfig.json
+/workspaces/codespaces-blank/QuickSortParallelApp/bin/Debug/net6.0/quick-sort-parallel.dll
+/workspaces/codespaces-blank/QuickSortParallelApp/bin/Debug/net6.0/quick-sort-parallel.pdb
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.GeneratedMSBuildEditorConfig.editorconfig
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.AssemblyInfoInputs.cache
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.AssemblyInfo.cs
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.csproj.CoreCompileInputs.cache
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.sourcelink.json
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.dll
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/refint/quick-sort-parallel.dll
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.pdb
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/quick-sort-parallel.genruntimeconfig.cache
+/workspaces/codespaces-blank/QuickSortParallelApp/obj/Debug/net6.0/ref/quick-sort-parallel.dll
