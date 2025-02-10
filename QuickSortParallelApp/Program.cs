@@ -43,34 +43,26 @@ namespace QuickSortParallelApp
 
         public static void QuickSortParallel(int[] array, int left, int right)
         {
-            int threshold = 10000;
             if (left < right)
             {
-                int pivotIndex = Partition(array, left, right);
-
-                Task leftTask = null;
-                Task rightTask = null;
-
-                if ((pivotIndex - 1 - left) > threshold)
+                // Use parallel execution for arrays larger than 500 elements
+                if (right - left > 500)
                 {
-                    leftTask = Task.Run(() => QuickSortParallel(array, left, pivotIndex - 1));
+                    int pivot = Partition(array, left, right);
+                    
+                    // Create parallel tasks for both halves
+                    Parallel.Invoke(
+                        () => QuickSortParallel(array, left, pivot - 1),
+                        () => QuickSortParallel(array, pivot + 1, right)
+                    );
                 }
                 else
                 {
-                    QuickSortParallel(array, left, pivotIndex - 1);
+                    // Use regular quicksort for smaller arrays
+                    int pivot = Partition(array, left, right);
+                    QuickSortParallel(array, left, pivot - 1);
+                    QuickSortParallel(array, pivot + 1, right);
                 }
-
-                if ((right - pivotIndex - 1) > threshold)
-                {
-                    rightTask = Task.Run(() => QuickSortParallel(array, pivotIndex + 1, right));
-                }
-                else
-                {
-                    QuickSortParallel(array, pivotIndex + 1, right);
-                }
-
-                leftTask?.Wait();
-                rightTask?.Wait();
             }
         }
 
