@@ -1,6 +1,0 @@
-/workspaces/codespaces-blank/obj/Debug/net6.0/quick-sort-parallel.csproj.AssemblyReference.cache
-/workspaces/codespaces-blank/obj/Debug/net6.0/quick-sort-parallel.GeneratedMSBuildEditorConfig.editorconfig
-/workspaces/codespaces-blank/obj/Debug/net6.0/quick-sort-parallel.AssemblyInfoInputs.cache
-/workspaces/codespaces-blank/obj/Debug/net6.0/quick-sort-parallel.AssemblyInfo.cs
-/workspaces/codespaces-blank/obj/Debug/net6.0/quick-sort-parallel.csproj.CoreCompileInputs.cache
-/workspaces/codespaces-blank/obj/Debug/net6.0/quick-sort-parallel.sourcelink.json
